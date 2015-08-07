@@ -32,7 +32,7 @@ namespace DapperProblem
                     and isnull(cs.StartDate, '2000-1-1') < getdate()
                     and exists (select * from dbo.Surveys s where s.Id = cs.SurveyId and s.IsActive = 1);";
 
-            //  This returns incorrect data (Id = 2)                       
+            //  This returns incorrect data (Id <> 3)         * When problem is properly duplicated...              
             const string sql =
                 @"select cs.*
                   from dbo.ClientSurveys cs
