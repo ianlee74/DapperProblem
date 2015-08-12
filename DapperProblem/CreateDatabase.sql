@@ -1,14 +1,5 @@
-﻿CREATE DATABASE [DapperProblem]
- CONTAINMENT = NONE
- ON  PRIMARY 
-( NAME = N'DapperProblem', FILENAME = N'D:\Databases\MSSQL12.MSSQLSERVER\MSSQL\DATA\DapperProblem.mdf' , SIZE = 4096KB , FILEGROWTH = 1024KB )
- LOG ON 
-( NAME = N'DapperProblem_log', FILENAME = N'D:\Databases\MSSQL12.MSSQLSERVER\MSSQL\DATA\DapperProblem_log.ldf' , SIZE = 1024KB , FILEGROWTH = 10%)
-GO
-
-use DapperProblem;
-go
-
+﻿-- Step #1:  Create an Azure Database.
+-- Step #2:  Run the following against the new database.
 CREATE TABLE [dbo].[Clients] (
     [Id]             INT             IDENTITY (1, 1) NOT NULL,
     [Name]           NVARCHAR (256)  NOT NULL,
@@ -39,13 +30,6 @@ CREATE TABLE [dbo].[ClientSurveys] (
     [Name]                 NVARCHAR (512) NOT NULL,
     [StartDate]            DATETIME       NULL,
     [EndDate]              DATETIME       NULL,
-    [IsPatientDefault]     BIT            DEFAULT ((0)) NOT NULL,
-    [ClientSurveyBundleId] INT            NULL,
-    [IsLocked]             BIT            DEFAULT ((0)) NOT NULL,
-    [IntroHtml]            NVARCHAR (MAX) NULL,
-    [OutroHtml]            NVARCHAR (MAX) NULL,
-    [MaxResponses]         INT            DEFAULT ((1)) NOT NULL,
-	[Description]		   NVARCHAR(2000) NULL,
     PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_ClientSurveys_ClientId] FOREIGN KEY ([ClientId]) REFERENCES [dbo].[Clients] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT [FK_ClientSurveys_SurveyId] FOREIGN KEY ([SurveyId]) REFERENCES [dbo].[Surveys] ([Id]) ON DELETE CASCADE ON UPDATE CASCADE
@@ -54,8 +38,23 @@ go
 create unique index SK_ClientSurveys on dbo.ClientSurveys (ClientId, SurveyId, StartDate)
 go
 
-insert into dbo.ClientSurveys (ClientId, SurveyId, Name, StartDate, EndDate, IsPatientDefault) values (1, 1, 'Client Survey #1', '1/1/1900', '1/1/1901', 0);
-insert into dbo.ClientSurveys (ClientId, SurveyId, Name, StartDate, EndDate, IsPatientDefault) values (1, 1, 'Client Survey #2', '1/1/1901', '1/1/1902', 0);
-insert into dbo.ClientSurveys (ClientId, SurveyId, Name, StartDate, EndDate, IsPatientDefault) values (1, 1, 'Client Survey #3', '1/1/1902', '1/1/2016', 1);
+insert into dbo.ClientSurveys (ClientId, SurveyId, Name, StartDate, EndDate) values (1, 1, 'Client Survey #1', '1/1/1900', '1/1/1901');
+insert into dbo.ClientSurveys (ClientId, SurveyId, Name, StartDate, EndDate) values (1, 1, 'Client Survey #2', '1/1/1901', '1/1/1902');
+insert into dbo.ClientSurveys (ClientId, SurveyId, Name, StartDate, EndDate) values (1, 1, 'Client Survey #3', '1/1/1902', '1/1/2016');
 go
 
+CREATE TABLE [dbo].[Patients] (
+    [Id]             INT             IDENTITY (1, 1) NOT NULL,
+    [Name]           NVARCHAR (256)  NOT NULL,
+	[SSN]			 nvarchar(9) not null,
+    PRIMARY KEY CLUSTERED ([Id] ASC),
+    UNIQUE NONCLUSTERED ([Name] ASC),
+);
+go
+
+insert into dbo.Patients (Name, SSN) values ('DOE, JOHN', '123456789');
+insert into dbo.Patients (Name, SSN) values ('DOE, JANE', '234567890');
+go
+
+-- Step #3: Enable Dynamic Data Masking and add a mask on Patients.SSN.
+-- Step #4: Test using mydatabase.database.windows.net vs mydatabase.database.secure.windows.net connections.
