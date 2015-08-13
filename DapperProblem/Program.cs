@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using DapperProblem.Models;
 using System.Data.SqlClient;
 using System.Configuration;
-//using Dapper;
+using Dapper;
 
 namespace DapperProblem
 {
@@ -19,24 +19,25 @@ namespace DapperProblem
 
             var p = new Program();
 
-            //Console.WriteLine("*** [Dapper] Get POCO results via non-secure connection. ***");
-            //var clientSurvey = p.GetDapperResultsAsync("NoDdmConnection").Result;
-            //Console.WriteLine("Id = {0}", clientSurvey.Id);
-            //Console.WriteLine("SurveyId = {0}", clientSurvey.SurveyId);
-            //Console.WriteLine();
+            Console.WriteLine("*** [Dapper] Get POCO results via non-secure connection. ***");
+            var clientSurvey = p.GetDapperResultsAsync("NoDdmConnection").Result;
+            Console.WriteLine("Id = {0}", clientSurvey.Id);
+            Console.WriteLine("SurveyId = {0}", clientSurvey.SurveyId);
+            Console.WriteLine();
 
-            //Console.WriteLine("*** [Dapper] Get POCO results via secure connection. ***");
-            //clientSurvey = p.GetDapperResultsAsync("DdmConnection").Result;
-            //Console.WriteLine("Id = {0}", clientSurvey.Id);
-            //Console.WriteLine("SurveyId = {0}", clientSurvey.SurveyId);
-            //Console.WriteLine();
+            Console.WriteLine("*** [Dapper] Get POCO results via secure connection. ***");
+            clientSurvey = p.GetDapperResultsAsync("DdmConnection").Result;
+            Console.WriteLine("Id = {0}", clientSurvey.Id);
+            Console.WriteLine("SurveyId = {0}", clientSurvey.SurveyId);
+            Console.WriteLine();
 
-            //Console.WriteLine("*** [Dapper] Get results using ExecuteReaderAsync() via non-secure connection. ***");
-            //p.GetDapperDataReaderResultsAsync("NoDdmConnection").Wait();
-            //Console.WriteLine();
+            Console.WriteLine("*** [Dapper] Get results using ExecuteReaderAsync() via non-secure connection. ***");
+            p.GetDapperDataReaderResultsAsync("NoDdmConnection").Wait();
+            Console.WriteLine();
 
-            //Console.WriteLine("*** [Dapper] Get results using ExecuteReaderAsync() via secure connection. ***");
-            //p.GetDapperDataReaderResultsAsync("DdmConnection").Wait();
+            Console.WriteLine("*** [Dapper] Get results using ExecuteReaderAsync() via secure connection. ***");
+            p.GetDapperDataReaderResultsAsync("DdmConnection").Wait();
+            Console.WriteLine();
 
             Console.WriteLine("*** [Native] Get results via non-secure connection. ***");
             p.GetNativeDataReaderResultsAsync("NoDdmConnection").Wait();
@@ -58,31 +59,31 @@ namespace DapperProblem
                 and isnull(cs.StartDate, '2000-1-1') < getdate() 
                 and s.IsActive = 1;";
 
-        //public async Task<ClientSurvey> GetDapperResultsAsync(string connectionStringName)
-        //{
-        //    using (var cnn = await OpenConnectionAsync(connectionStringName))
-        //    {
-        //        var surveys = (await cnn.QueryAsync<ClientSurvey>(sql)).ToList();
-        //        var clientSurvey = surveys.First();
-        //        return clientSurvey;
-        //    }
-        //}
+        public async Task<ClientSurvey> GetDapperResultsAsync(string connectionStringName)
+        {
+            using (var cnn = await OpenConnectionAsync(connectionStringName))
+            {
+                var surveys = (await cnn.QueryAsync<ClientSurvey>(sql)).ToList();
+                var clientSurvey = surveys.First();
+                return clientSurvey;
+            }
+        }
 
-        //public async Task GetDapperDataReaderResultsAsync(string connectionStringName)
-        //{
-        //    using (var cnn = await OpenConnectionAsync(connectionStringName))
-        //    {
-        //        var dr = await cnn.ExecuteReaderAsync(sql, cnn);
-        //        while(dr.Read())
-        //        {
-        //            for (var i = 0; i < dr.FieldCount; i++)
-        //            {
-        //                Console.WriteLine(string.Format("{0}: {1}", dr.GetName(i), dr.GetValue(i)));
-        //            }
-        //        }
-        //        dr.Close();
-        //    }
-        //}
+        public async Task GetDapperDataReaderResultsAsync(string connectionStringName)
+        {
+            using (var cnn = await OpenConnectionAsync(connectionStringName))
+            {
+                var dr = await cnn.ExecuteReaderAsync(sql, cnn);
+                while (dr.Read())
+                {
+                    for (var i = 0; i < dr.FieldCount; i++)
+                    {
+                        Console.WriteLine(string.Format("{0}: {1}", dr.GetName(i), dr.GetValue(i)));
+                    }
+                }
+                dr.Close();
+            }
+        }
 
         public async Task GetNativeDataReaderResultsAsync(string connectionStringName)
         {
