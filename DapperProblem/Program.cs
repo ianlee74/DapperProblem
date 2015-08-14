@@ -45,6 +45,13 @@ namespace DapperProblem
 
             Console.WriteLine("*** [Native] Get results via secure connection. ***");
             p.GetNativeDataReaderResultsAsync("DdmConnection").Wait();
+            Console.WriteLine();
+
+            Console.WriteLine("*** [Dapper] Get POCO results with manually added trailing Id. ***");
+            clientSurvey = p.GetDapperResults2Async("DdmConnection").Result;
+            Console.WriteLine("Id = {0}", clientSurvey.Id);
+            Console.WriteLine("SurveyId = {0}", clientSurvey.SurveyId);
+            Console.WriteLine();
 
             Console.ReadLine();
         }
@@ -64,6 +71,20 @@ namespace DapperProblem
             using (var cnn = await OpenConnectionAsync(connectionStringName))
             {
                 var surveys = (await cnn.QueryAsync<ClientSurvey>(sql)).ToList();
+                var clientSurvey = surveys.First();
+                return clientSurvey;
+            }
+        }
+        public async Task<ClientSurvey> GetDapperResults2Async(string connectionStringName)
+        {
+            const string sql2 =
+                @"select cs.*, [Id] = 1
+                from dbo.ClientSurveys cs
+                where cs.Id = 3;";
+
+            using (var cnn = await OpenConnectionAsync(connectionStringName))
+            {
+                var surveys = (await cnn.QueryAsync<ClientSurvey>(sql2)).ToList();
                 var clientSurvey = surveys.First();
                 return clientSurvey;
             }
